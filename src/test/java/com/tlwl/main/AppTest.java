@@ -1,4 +1,4 @@
-package com.tlwl.app;
+package com.tlwl.main;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
