@@ -5,17 +5,25 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.tlwl.db.BaseDao;
+import com.tlwl.db.mysql.MysqlDao;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+
+import java.util.List;
 
 @Path("/rs")
 public class Rs {
 
     @GET
-    @Path("{name}")
     @Produces(MediaType.TEXT_PLAIN)
-    //访问路径 /echo/everyone
-    public String hello(@PathParam("name") String name){
-        System.out.println("rs say: " + name);
-        return "rs say: " + name;
+    @Path("{name}")
+    public Object hello(@PathParam("name") String name){
+        BaseDao idao = new MysqlDao();
+        List<Object> rs = idao.retrieve("1", null, null, null);
+        return rs;
     }
 }
 
