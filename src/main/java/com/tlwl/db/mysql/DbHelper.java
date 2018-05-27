@@ -15,8 +15,8 @@ public class DbHelper {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(
-                    "jdbc:mysql://tlwl2020.mysql.rds.aliyuncs.com:3686/jrest?"+
-                            "user=root&password=znhl2017UP&characterEncoding=utf8&useSSL=false");
+                    "jdbc:mysql://192.168.1.8:3306/jrest?"+
+                            "user=root&password=123456&characterEncoding=utf8&useSSL=false&autoReconnect=true");
         } catch (SQLException ex) {
             // handle any errors
             System.out.println("SQLException: " + ex.getMessage());
@@ -55,27 +55,27 @@ public class DbHelper {
             System.out.println("VendorError: " + ex.getErrorCode());
         }
         finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException sqlEx) { } // ignore
-
-                conn = null;
-            }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException sqlEx) { } // ignore
-
-                rs = null;
+                } catch (SQLException sqlEx) {
+                    sqlEx.printStackTrace();
+                }
             }
 
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException sqlEx) { } // ignore
-
-                stmt = null;
+                } catch (SQLException sqlEx) {
+                    sqlEx.printStackTrace();
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException sqlEx) {
+                    sqlEx.printStackTrace();
+                }
             }
         }
         JSONObject result = new JSONObject();
