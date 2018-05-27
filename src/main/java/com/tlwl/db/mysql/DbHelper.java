@@ -1,15 +1,14 @@
 package com.tlwl.db.mysql;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DbHelper {
     private static Connection createConnection(){
@@ -27,25 +26,25 @@ public class DbHelper {
         return conn;
     }
 
-    public static List<Object> select(){  //String tablename, Object params, String [] fields
+    public static JSONObject select(String id){  //String tablename, Object params, String [] fields
         Connection conn = createConnection();
         if(conn == null)
             return null;
         Statement stmt = null;
         ResultSet rs = null;
-        List<Object> list = new ArrayList();
+        JSONArray json = new JSONArray();
         try {
             stmt = conn.createStatement();
-            if(stmt.execute("SELECT * FROM role")){
+            if(stmt.execute("SELECT * FROM " + id)){
                 rs =  stmt.getResultSet();
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int columnCount = rsmd.getColumnCount();
                 while(rs.next()){
-                    Map<String, Object> map = new HashMap();
+                    JSONObject jo = new JSONObject();
                     for (int i = 1; i <= columnCount; i++) {
-                        map.put(rsmd.getColumnLabel(i), rs.getObject(i));
+                        jo.put(rsmd.getColumnLabel(i), rs.getObject(i));
                     }
-                    list.add(map);
+                    json.put(jo);
                 }
             }
         }
@@ -79,6 +78,9 @@ public class DbHelper {
                 stmt = null;
             }
         }
-        return list;
+        JSONObject result = new JSONObject();
+        result.put("code", 200);
+        result.put("rows", json);
+        return result;
     }
 }

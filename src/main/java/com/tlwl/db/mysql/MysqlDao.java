@@ -1,11 +1,11 @@
 package com.tlwl.db.mysql;
 
 import com.tlwl.db.BaseDao;
-import java.util.List;
+import org.json.JSONObject;
 
 public class MysqlDao implements BaseDao {
-    public List<Object> retrieve(String id, Object params, String [] fields, Object session){
-        List<Object> rs = DbHelper.select();
+    public JSONObject retrieve(String id, Object params, String [] fields, Object session){
+        JSONObject rs = DbHelper.select(id);
         return rs;
     }
 }
