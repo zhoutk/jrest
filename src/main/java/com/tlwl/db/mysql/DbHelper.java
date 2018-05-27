@@ -42,7 +42,16 @@ public class DbHelper {
                 while(rs.next()){
                     JSONObject jo = new JSONObject();
                     for (int i = 1; i <= columnCount; i++) {
-                        jo.put(rsmd.getColumnLabel(i), rs.getObject(i));
+                        String theKey = rsmd.getColumnLabel(i);
+                        if(theKey.endsWith("_json")){
+                            String theValue = rs.getObject(i).toString();
+                            if(theValue.startsWith("["))
+                                jo.put(theKey, new JSONArray(theValue));
+                            else
+                                jo.put(theKey, new JSONObject(theValue));
+                        }else{
+                            jo.put(theKey, rs.getObject(i));
+                        }
                     }
                     json.put(jo);
                 }
