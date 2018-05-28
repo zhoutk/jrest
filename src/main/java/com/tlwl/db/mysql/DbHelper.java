@@ -9,14 +9,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import com.tlwl.utils.Tools;
 
 public class DbHelper {
     private static Connection createConnection(){
         Connection conn = null;
         try {
+            JSONObject configs = Tools.jsonRead("./configs.json");
+            JSONObject dbConfs = configs.getJSONObject("db_mysql_config");
             conn = DriverManager.getConnection(
-                    "jdbc:mysql://192.168.1.8:3306/jrest?"+
-                            "user=root&password=123456&characterEncoding=utf8&useSSL=false&autoReconnect=true");
+                    "jdbc:mysql://"+dbConfs.getString("db_host")+":"+dbConfs.getInt("db_port")+"/"+dbConfs.getString("db_name")+"?"+
+                            "user="+dbConfs.getString("db_user")+"&password="+dbConfs.getString("db_passwd")+"&characterEncoding=utf8&useSSL=false&autoReconnect=true");
         } catch (SQLException ex) {
             // handle any errors
             System.out.println("SQLException: " + ex.getMessage());
@@ -44,10 +47,10 @@ public class DbHelper {
                     for (int i = 1; i <= columnCount; i++) {
                         String theKey = rsmd.getColumnLabel(i);
                         if(theKey.endsWith("_json")){
-                            String theValue = rs.getObject(i).toString();
-                            if(theValue.startsWith("["))
+                            String theValue = rs.getObject(i) == null ? null : rs.getObject(i).toString();
+                            if(theValue != null && theValue.startsWith("["))
                                 jo.put(theKey, new JSONArray(theValue));
-                            else
+                            else if(theValue != null)
                                 jo.put(theKey, new JSONObject(theValue));
                         }else{
                             jo.put(theKey, rs.getObject(i));
@@ -57,11 +60,8 @@ public class DbHelper {
                 }
             }
         }
-        catch (SQLException ex){
-            // handle any errors
+        catch (Exception ex){
             System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
         }
         finally {
             if (rs != null) {

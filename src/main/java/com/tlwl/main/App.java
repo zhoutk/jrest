@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 
 public class App {
-    public static final String BASE_URI = "http://localhost:5000/";
+    public static final String BASE_URI = "http://0.0.0.0:5000/";
 
     public static HttpServer startServer() {
         // create a resource config that scans for JAX-RS resources and providers

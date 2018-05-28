@@ -1,5 +1,6 @@
 # DIY
 target/
+**/configs.json
 
 # svn
 .svn/
