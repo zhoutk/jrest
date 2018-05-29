@@ -11,7 +11,7 @@ public class Tools {
         JSONObject dataJson = null;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String s = "", tmp = null;
+            String s = "", tmp;
             while ((tmp = br.readLine()) != null) {
                 s += tmp;
             }
