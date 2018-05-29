@@ -50,7 +50,8 @@ public class MysqlDao {
                 where += " and ";
 
                 if(is_search){
-                    where += key + " like '%" + value + "%'";
+                    where += key + " like ? ";
+                    values.put("%" + value + "%");
                 }else{
                     where += key + " = ? ";
                     values.put(value);
