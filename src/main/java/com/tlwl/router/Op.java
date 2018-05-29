@@ -1,21 +1,22 @@
 package com.tlwl.router;
 
-import javax.ws.rs.GET;
+import com.tlwl.main.GlobalConst;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/op")
-public class Op {
+public class Op extends BaseRs{
 
-    @GET
-    @Path("{name}")
-    @Produces(MediaType.TEXT_PLAIN)
-    //访问路径 /echo/everyone
-    public String hello(@PathParam("name") String name){
-        System.out.println("op say: " + name);
-        return "op say: " + name;
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{tablename}")
+    public String rsPost(@PathParam("tablename") String tablename, @Context UriInfo ui){
+        return GlobalConst.OPSUCCESS.toString();
     }
 }
 
