@@ -12,30 +12,21 @@ import com.tlwl.utils.RouterHelper;
 import java.util.Map;
 
 @Path("/rs")
-public class Rs {
-
+public class Rs extends BaseRs {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{tablename}/{id}")
-    public String rsGetId(@PathParam("tablename") String tablename, @PathParam("id") String id, @Context UriInfo ui){
+    public String rsGet(@PathParam("tablename") String tablename, @PathParam("id") String id, @Context UriInfo ui){
         Map queryParams = ui.getQueryParameters();
         return RouterHelper.process(tablename, queryParams, id);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{tablename}")
-    public String rsGetId(@PathParam("tablename") String tablename, @Context UriInfo ui){
+    @Path("{tablename}")
+    public String rsGet(@PathParam("tablename") String tablename, @Context UriInfo ui){
         Map queryParams = ui.getQueryParameters();
         return RouterHelper.process(tablename, queryParams);
-    }
-
-    @GET
-    @Path("{tablename}/{id}/{ps:(.*)}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String zrs(){
-        System.out.println("rest api not exist. ");
-        return "{\"code\": 404, \"err\": \"the rest api not exist.\"}";
     }
 }
 
