@@ -29,5 +29,13 @@ public class Rs {
         Map queryParams = ui.getQueryParameters();
         return RouterHelper.process(tablename, queryParams);
     }
+
+    @GET
+    @Path("{tablename}/{id}/{ps:(.*)}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String zrs(){
+        System.out.println("rest api not exist. ");
+        return "{\"code\": 404, \"err\": \"the rest api not exist.\"}";
+    }
 }
 
