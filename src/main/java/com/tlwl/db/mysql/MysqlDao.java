@@ -4,12 +4,7 @@ import com.tlwl.main.GlobalConst;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import java.sql.*;
 import java.util.Iterator;
 
 public class MysqlDao {
@@ -33,7 +28,9 @@ public class MysqlDao {
         return query(tablename, params, fields, null, null);
     }
 
-    private static JSONObject query(String tablename, JSONObject params, String[] fields, String sql, String [] values){
+    private static JSONObject query(String tablename, JSONObject params, String[] fields, String sql, JSONArray values){
+        if(values == null)
+            values = new JSONArray();
         String where = "";
         Boolean is_search = false;
         if(params.has("search")){
@@ -55,7 +52,8 @@ public class MysqlDao {
                 if(is_search){
                     where += key + " like '%" + value + "%'";
                 }else{
-                    where += key + " = " + value;
+                    where += key + " = ? ";
+                    values.put(value);
                 }
         }
 
@@ -68,7 +66,7 @@ public class MysqlDao {
             }
         }
 
-        return execQuery(sql, null);
+        return execQuery(sql, values);
     }
 
     private static JSONObject execQuery(String sql, JSONArray values){
@@ -78,13 +76,22 @@ public class MysqlDao {
         Connection conn = createConnection();
         if(conn == null)
             return null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         JSONArray json = new JSONArray();
+        Iterator ks = values.iterator();
+        DBParams ps = new DBParams();
+        int m = 0;
+        while (ks.hasNext()) {
+            ps.addParam(values.get(m));
+            m++;
+            ks.next();
+        }
         try {
-            stmt = conn.createStatement();
-            if(stmt.execute(sql)){
-                rs =  stmt.getResultSet();
+            stmt = conn.prepareStatement(sql);
+            ps.prepareStatement(stmt);
+//            if(stmt.execute(sql)){
+                rs =  stmt.executeQuery();
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int columnCount = rsmd.getColumnCount();
                 while(rs.next()){
@@ -103,9 +110,9 @@ public class MysqlDao {
                     }
                     json.put(jo);
                 }
-                System.out.println("SQL: " + sql);
+                System.out.println("SQL: " + sql + "; VALUES: " + values.toString());
             }
-        }
+//        }
         catch (SQLException ex){
             flag = false;
             errorCode = ex.getErrorCode();
