@@ -1,5 +1,6 @@
 package com.tlwl.db.mysql;
 
+import com.tlwl.main.GlobalConst;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,8 +16,7 @@ public class MysqlDao {
     private static Connection createConnection(){
         Connection conn = null;
         try {
-            JSONObject configs = Tools.jsonRead("./configs.json");
-            JSONObject dbConfs = configs.getJSONObject("db_mysql_config");
+            JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
             conn = DriverManager.getConnection(
                     "jdbc:mysql://"+dbConfs.getString("db_host")+":"+dbConfs.getInt("db_port")+"/"+dbConfs.getString("db_name")+"?"+
                             "user="+dbConfs.getString("db_user")+"&password="+dbConfs.getString("db_passwd")+"&characterEncoding=utf8&useSSL=false&autoReconnect=true");
