@@ -90,8 +90,8 @@ public class MysqlDao {
         try {
             stmt = conn.prepareStatement(sql);
             ps.prepareStatement(stmt);
-//            if(stmt.execute(sql)){
-                rs =  stmt.executeQuery();
+            if(stmt.execute()){
+                rs =  stmt.getResultSet();
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int columnCount = rsmd.getColumnCount();
                 while(rs.next()){
@@ -112,7 +112,7 @@ public class MysqlDao {
                 }
                 System.out.println("SQL: " + sql + "; VALUES: " + values.toString());
             }
-//        }
+        }
         catch (SQLException ex){
             flag = false;
             errorCode = ex.getErrorCode();
