@@ -8,18 +8,20 @@ import java.sql.*;
 import java.util.Iterator;
 
 public class MysqlDao {
+    private static Connection conn = null;
     private static Connection createConnection() {
-        Connection conn = null;
-        try {
-            JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
-            conn = DriverManager.getConnection(
-                    "jdbc:mysql://" + dbConfs.getString("db_host") + ":" + dbConfs.getInt("db_port") + "/" + dbConfs.getString("db_name") + "?" +
-                            "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_passwd") + "&characterEncoding=utf8&useSSL=false&autoReconnect=true");
-        } catch (SQLException ex) {
-            // handle any errors
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
+        if(conn == null) {
+            try {
+                JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
+                conn = DriverManager.getConnection(
+                        "jdbc:mysql://" + dbConfs.getString("db_host") + ":" + dbConfs.getInt("db_port") + "/" + dbConfs.getString("db_name") + "?" +
+                                "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_passwd") + "&characterEncoding=utf8&useSSL=false&autoReconnect=true");
+            } catch (SQLException ex) {
+                // handle any errors
+                System.out.println("SQLException: " + ex.getMessage());
+                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println("VendorError: " + ex.getErrorCode());
+            }
         }
         return conn;
     }
@@ -132,13 +134,6 @@ public class MysqlDao {
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException sqlEx) {
-                    sqlEx.printStackTrace();
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
                 } catch (SQLException sqlEx) {
                     sqlEx.printStackTrace();
                 }
