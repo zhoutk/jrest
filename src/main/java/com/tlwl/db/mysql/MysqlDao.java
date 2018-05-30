@@ -69,9 +69,8 @@ public class MysqlDao {
         Iterator<String> ks = params.keys();
         while (ks.hasNext()) {
             String key = ks.next();
-            Object value = params.get(key);
-            if (where != "")
-                where += " and ";
+            if (!where.isEmpty())
+                    where += " and ";
 
             if(key.equals("ins")){
                 if(ins.length() < 2){
@@ -107,12 +106,30 @@ public class MysqlDao {
                     where += ors.length() > 0 ? " or " : "";
                 }while (ors.length() > 0);
                 where += " ) ";
-            } else if (is_search) {
-                where += key + " like ? ";
-                values.put("%" + value + "%");
-            } else {
-                where += key + " = ? ";
-                values.put(value);
+            } else{
+                String  value = params.getString(key);
+                if(value.startsWith("<,") || value.startsWith("<=,") || value.startsWith(">,") ||
+                        value.startsWith(">=,") || value.startsWith("<>,") || value.startsWith("=,")){
+                    String[] vls = value.split(",");
+                    if(vls.length == 2){
+                        where += key + vls[0] + " ? ";
+                        values.put(vls[1]);
+                    }else if(vls.length == 4){
+                        where += key + vls[0] + " ? and " + key + vls[2] + " ? ";
+                        values.put(vls[1]);
+                        values.put(vls[3]);
+                    }else{
+                        if(where.endsWith(" and ")){
+                            where = where.substring(0, where.length() - 4);
+                        }
+                    }
+                }else if (is_search) {
+                    where += key + " like ? ";
+                    values.put("%" + value + "%");
+                } else {
+                    where += key + " = ? ";
+                    values.put(value);
+                }
             }
         }
 
