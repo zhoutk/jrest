@@ -10,9 +10,10 @@ import java.util.Iterator;
 
 public class MysqlDao {
     private static JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
-    private static Connection conn[] = new Connection[dbConfs.getInt("db_conn_limit")];
+    private static int PoolMaxSize = dbConfs.getInt("db_conn_limit");
+    private static Connection conn[] = new Connection[PoolMaxSize];
     private static Connection createConnection() {
-        int index = RandomUtils.nextInt(0, 10);
+        int index = RandomUtils.nextInt(0, dbConfs.getInt("db_conn_limit"));
         if(conn[index] == null) {
             try {
                 conn[index] = DriverManager.getConnection(
