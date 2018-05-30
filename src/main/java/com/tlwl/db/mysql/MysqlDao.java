@@ -96,6 +96,17 @@ public class MysqlDao {
                     values.put("%" + val + "%");
                 }while (lks.length() > 0);
                 where += " ) ";
+            }else if(key.equals("ors")){
+                if(ors.length() < 2 || ors.length() % 2 == 1){
+                    return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ors is error.");
+                }
+                where += " ( ";
+                do{
+                    where += ors.remove(0).toString() + " = ? ";
+                    values.put(ors.remove(0));
+                    where += ors.length() > 0 ? " or " : "";
+                }while (ors.length() > 0);
+                where += " ) ";
             } else if (is_search) {
                 where += key + " like ? ";
                 values.put("%" + value + "%");
