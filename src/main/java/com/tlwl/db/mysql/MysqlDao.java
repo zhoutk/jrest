@@ -30,11 +30,11 @@ public class MysqlDao {
         return conn[index];
     }
 
-    public static JSONObject select(String tablename, JSONObject params, String[] fields) {  //String tablename, Object params, String [] fields
+    public static JSONObject select(String tablename, JSONObject params, JSONArray fields) {  //String tablename, Object params, String [] fields
         return query(tablename, params, fields, null, null);
     }
 
-    private static JSONObject query(String tablename, JSONObject params, String[] fields, String sql, JSONArray values) {
+    private static JSONObject query(String tablename, JSONObject params, JSONArray fields, String sql, JSONArray values) {
         if (values == null)
             values = new JSONArray();
         String where = "";
@@ -133,10 +133,18 @@ public class MysqlDao {
             }
         }
 
+        String poly = "";
+        if(count != null){
+            do{
+                poly += ",count(" + count.remove(0) + ") as " + count.remove(0) + " ";
+            }while (count.length() > 0);
+        }
+
         if (tablename == "QuerySqlSelect") {
             sql += "";
         } else {
-            sql = "SELECT * FROM " + tablename;
+            sql = "SELECT " + (fields != null && fields.length() > 0 ? fields.join(",") :
+                    (poly.length() > 0 ? "id" : "*")) + poly + " FROM " + tablename;
             if (where != "") {
                 sql += " WHERE " + where;
             }
