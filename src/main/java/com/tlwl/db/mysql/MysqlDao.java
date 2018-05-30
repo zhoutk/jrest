@@ -1,13 +1,11 @@
 package com.tlwl.db.mysql;
 
 import com.tlwl.main.GlobalConst;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class MysqlDao {
@@ -80,12 +78,12 @@ public class MysqlDao {
                     return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ins is error.");
                 }
                 String c = ins.remove(0).toString();
-                String[] pSeat = new String[ins.length()];
-                Arrays.fill(pSeat,"?");
-                where += c + " in ( "+ StringUtils.join(pSeat, ',') +" ) ";
+                where += c + " in ( ";
                 do{
                     values.put(ins.remove(0));
+                    where += "?" + (ins.length() > 0 ? "," : "");
                 }while(ins.length() > 0);
+                where += " ) ";
             }else if(key.equals("lks")){
                 if(lks.length() < 2){
                     return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of lks is error.");
