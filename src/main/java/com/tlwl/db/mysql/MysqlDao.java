@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.sql.*;
 import java.util.Iterator;
+import java.util.Map;
 
 public class MysqlDao {
     private static JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
@@ -43,8 +44,8 @@ public class MysqlDao {
             is_search = true;
             params.remove("search");
         }
-        int page = params.has("page") ? Integer.parseInt(params.getString("page")) : 0;
-        int size = params.has("size") ? Integer.parseInt(params.getString("size")) : GlobalConst.PAGESIZE;
+        int page = params.has("page") ? Integer.parseInt(params.get("page").toString()) : 0;
+        int size = params.has("size") ? Integer.parseInt(params.get("size").toString()) : GlobalConst.PAGESIZE;
         String order = params.has("order") ? params.getString("order") : "";
         JSONArray lks = params.has("lks") ? params.getJSONArray("lks") : null;
         JSONArray ins = params.has("ins") ? params.getJSONArray("ins") : null;
@@ -171,7 +172,28 @@ public class MysqlDao {
             sql += " ORDER BY " + order;
         }
 
-        return execQuery(sql, values);
+        if(page > 0){
+            page--;
+            String sql1 = sql + " LIMIT " + page * size + "," + size;
+            int index = sql.toUpperCase().lastIndexOf(" FROM ");
+            int end = sql.toUpperCase().lastIndexOf(" ORDER BY ");
+            String sql2 = "SELECT COUNT(*) count " + sql.substring(index, end > 0 ? end : sql.length());
+            JSONObject rs1 = execQuery(sql1, values);
+            JSONObject rs2 = execQuery(sql2, values);
+            int ct = 0;
+            if(rs2.getInt("code") == 200 && group.length() == 0){
+                ct = rs2.getJSONArray("rows").getJSONObject(0).getInt("count");
+            }else if(group.length() > 0){
+                ct = rs2.getJSONArray("rows").length();
+            }
+            rs1.put("count", Math.ceil(ct /size));
+            rs1.put("records", ct);
+            return rs1;
+        }else{
+            JSONObject rs = execQuery(sql, values);
+            rs.put("count", rs.getInt("code") == 200 ? 1 : 0);
+            return rs;
+        }
     }
 
     private static JSONObject execQuery(String sql, JSONArray values) {
@@ -244,8 +266,9 @@ public class MysqlDao {
         }
         JSONObject result = new JSONObject();
         if (flag) {
-            result.put("code", 200);
+            result.put("code", json.length() > 0 ? 200 : 602);
             result.put("rows", json);
+            result.put("records", json.length());
         } else {
             result.put("code", 500);
             result.put("errcode", errorCode);
