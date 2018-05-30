@@ -7,7 +7,6 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.sql.*;
 import java.util.Iterator;
-import java.util.Map;
 
 public class MysqlDao {
     private static JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
@@ -44,6 +43,7 @@ public class MysqlDao {
             is_search = true;
             params.remove("search");
         }
+        fields = params.has("fields") ? params.getJSONArray("fields") : fields;
         int page = params.has("page") ? Integer.parseInt(params.get("page").toString()) : 0;
         int size = params.has("size") ? Integer.parseInt(params.get("size").toString()) : GlobalConst.PAGESIZE;
         String order = params.has("order") ? params.getString("order") : "";
@@ -54,6 +54,8 @@ public class MysqlDao {
         JSONArray sum = params.has("sum") ? params.getJSONArray("sum") : null;
         JSONArray ors = params.has("ors") ? params.getJSONArray("ors") : null;
 
+        if(params.has("fields"))
+            params.remove("fields");
         if(params.has("group"))
             params.remove("group");
         if(params.has("order"))
@@ -158,8 +160,10 @@ public class MysqlDao {
         if (tablename == "QuerySqlSelect") {
             sql += "";
         } else {
-            sql = "SELECT " + (fields != null && fields.length() > 0 ? fields.join(",") :
-                    (poly.length() > 0 ? "id" : "*")) + poly + " FROM " + tablename;
+            String fls = "";
+            if(fields != null && fields.length() > 0)
+                fls = fields.join(",").replaceAll("\"", "");
+            sql = "SELECT " + (fls.length() > 0 ? fls : (poly.length() > 0 ? "id" : "*")) + poly + " FROM " + tablename;
             if (where != "") {
                 sql += " WHERE " + where;
             }
