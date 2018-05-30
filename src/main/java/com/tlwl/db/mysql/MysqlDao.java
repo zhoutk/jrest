@@ -3,17 +3,19 @@ package com.tlwl.db.mysql;
 import com.tlwl.main.GlobalConst;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.sql.*;
 import java.util.Iterator;
 
 public class MysqlDao {
-    private static Connection conn = null;
+    private static JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
+    private static Connection conn[] = new Connection[dbConfs.getInt("db_conn_limit")];
     private static Connection createConnection() {
-        if(conn == null) {
+        int index = RandomUtils.nextInt(0, 10);
+        if(conn[index] == null) {
             try {
-                JSONObject dbConfs = GlobalConst.CONFIGS.getJSONObject("db_mysql_config");
-                conn = DriverManager.getConnection(
+                conn[index] = DriverManager.getConnection(
                         "jdbc:mysql://" + dbConfs.getString("db_host") + ":" + dbConfs.getInt("db_port") + "/" + dbConfs.getString("db_name") + "?" +
                                 "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_passwd") + "&characterEncoding=utf8&useSSL=false&autoReconnect=true");
             } catch (SQLException ex) {
@@ -23,7 +25,7 @@ public class MysqlDao {
                 System.out.println("VendorError: " + ex.getErrorCode());
             }
         }
-        return conn;
+        return conn[index];
     }
 
     public static JSONObject select(String tablename, JSONObject params, String [] fields){  //String tablename, Object params, String [] fields
