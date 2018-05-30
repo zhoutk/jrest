@@ -1,11 +1,13 @@
 package com.tlwl.db.mysql;
 
 import com.tlwl.main.GlobalConst;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class MysqlDao {
@@ -46,26 +48,45 @@ public class MysqlDao {
         int page = params.has("page") ? Integer.parseInt(params.getString("page")) : 0;
         int size = params.has("size") ? Integer.parseInt(params.getString("size")) : 0;
         String order = params.has("order") ? params.getString("order") : "";
-        String like = params.has("lks") ? params.getString("lks") : "";
-        String ins = params.has("ins") ? params.getString("ins") : "";
+        JSONArray like = params.has("lks") ? params.getJSONArray("lks") : null;
+        JSONArray ins = params.has("ins") ? params.getJSONArray("ins") : null;
         String group = params.has("group") ? params.getString("group") : "";
-        String count = params.has("count") ? params.getString("count") : "";
-        String sum = params.has("sum") ? params.getString("sum") : "";
-        String ors = params.has("ors") ? params.getString("ors") : "";
+        JSONArray count = params.has("count") ? params.getJSONArray("count") : null;
+        JSONArray sum = params.has("sum") ? params.getJSONArray("sum") : null;
+        JSONArray ors = params.has("ors") ? params.getJSONArray("ors") : null;
 
-        if(count.length() > 0){
-            JSONArray countPs = new JSONArray(count);
-            int d=0;
+        if(count != null){
+            if(count.length() == 0 || count.length() % 2 == 1){
+                return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of count is error.");
+            }
+            params.remove("count");
+        }
+        if(sum != null){
+            if(sum.length() == 0 || sum.length() % 2 == 1){
+                return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of sum is error.");
+            }
+            params.remove("count");
         }
 
         Iterator<String> ks = params.keys();
         while (ks.hasNext()) {
             String key = ks.next();
-            String value = params.getString(key);
+            Object value = params.get(key);
             if (where != "")
                 where += " and ";
 
-            if (is_search) {
+            if(key.equals("ins")){
+                if(ins.length() < 2){
+                    return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ins is error.");
+                }
+                String c = ins.remove(0).toString();
+                String[] pSeat = new String[ins.length()];
+                Arrays.fill(pSeat,"?");
+                where += c + " in ( "+ StringUtils.join(pSeat, ',') +" ) ";
+                do{
+                    values.put(ins.remove(0));
+                }while(ins.length() > 0);
+            } else if (is_search) {
                 where += key + " like ? ";
                 values.put("%" + value + "%");
             } else {

@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class RouterHelper {
-    private final static String [] ParamsLimits = {"is_search", "page", "size", "order", "lks", "ins", "group", "count", "sum", "ors"};
+    private final static String [] ParamsLimits = {"search", "page", "size", "order", "lks", "ins", "group", "count", "sum", "ors"};
     public static String process(String tablename, Map queryParams, String id){
         JSONObject params = new JSONObject();
 
@@ -34,7 +34,7 @@ public class RouterHelper {
                 return GlobalConst.ERRORS.getJSONObject("301").toString();
             }else if(arr.length == 1 && flagOflimit){            //处理特殊参数
                 try {
-                    if (key.equals("is_search") || key.equals("page") || key.equals("size")) {
+                    if (key.equals("search") || key.equals("page") || key.equals("size")) {
                         params.put(key, Integer.parseInt(arr[0]));
                     } else if (key.equals("count") || key.equals("sum")) {
                         params.put(key, new JSONArray(arr[0]));
