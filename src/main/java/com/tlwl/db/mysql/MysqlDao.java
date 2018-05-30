@@ -48,7 +48,7 @@ public class MysqlDao {
         int page = params.has("page") ? Integer.parseInt(params.getString("page")) : 0;
         int size = params.has("size") ? Integer.parseInt(params.getString("size")) : 0;
         String order = params.has("order") ? params.getString("order") : "";
-        JSONArray like = params.has("lks") ? params.getJSONArray("lks") : null;
+        JSONArray lks = params.has("lks") ? params.getJSONArray("lks") : null;
         JSONArray ins = params.has("ins") ? params.getJSONArray("ins") : null;
         String group = params.has("group") ? params.getString("group") : "";
         JSONArray count = params.has("count") ? params.getJSONArray("count") : null;
@@ -86,6 +86,18 @@ public class MysqlDao {
                 do{
                     values.put(ins.remove(0));
                 }while(ins.length() > 0);
+            }else if(key.equals("lks")){
+                if(lks.length() < 2){
+                    return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of lks is error.");
+                }
+                String val = lks.remove(0).toString();
+                where += " ( ";
+                do{
+                    where += lks.remove(0).toString() + " like ? ";
+                    where += lks.length() > 0 ? " or " : "";
+                    values.put("%" + val + "%");
+                }while (lks.length() > 0);
+                where += " ) ";
             } else if (is_search) {
                 where += key + " like ? ";
                 values.put("%" + value + "%");
