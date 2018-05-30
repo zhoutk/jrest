@@ -55,7 +55,7 @@ public class MysqlDao {
 
         if(params.has("group"))
             params.remove("group");
-        if(params.has("ordery"))
+        if(params.has("order"))
             params.remove("order");
         if(params.has("page"))
             params.remove("page");
