@@ -63,7 +63,7 @@ public class MysqlDao {
             if(sum.length() == 0 || sum.length() % 2 == 1){
                 return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of sum is error.");
             }
-            params.remove("count");
+            params.remove("sum");
         }
 
         Iterator<String> ks = params.keys();
@@ -138,6 +138,11 @@ public class MysqlDao {
             do{
                 poly += ",count(" + count.remove(0) + ") as " + count.remove(0) + " ";
             }while (count.length() > 0);
+        }
+        if(sum != null){
+            do{
+                poly += ",sum(" + sum.remove(0) + ") as " + sum.remove(0) + " ";
+            }while (sum.length() > 0);
         }
 
         if (tablename == "QuerySqlSelect") {
