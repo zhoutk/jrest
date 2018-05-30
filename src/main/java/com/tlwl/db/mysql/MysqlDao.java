@@ -47,6 +47,16 @@ public class MysqlDao {
         int size = params.has("size") ? Integer.parseInt(params.getString("size")) : 0;
         String order = params.has("order") ? params.getString("order") : "";
         String like = params.has("lks") ? params.getString("lks") : "";
+        String ins = params.has("ins") ? params.getString("ins") : "";
+        String group = params.has("group") ? params.getString("group") : "";
+        String count = params.has("count") ? params.getString("count") : "";
+        String sum = params.has("sum") ? params.getString("sum") : "";
+        String ors = params.has("ors") ? params.getString("ors") : "";
+
+        if(count.length() > 0){
+            JSONArray countPs = new JSONArray(count);
+            int d=0;
+        }
 
         Iterator<String> ks = params.keys();
         while (ks.hasNext()) {
