@@ -16,5 +16,6 @@
       "code": 404,
       "err": "the rest api is not exist."
     }
-  }
+  },
+  "PAGESIZE":10
 }

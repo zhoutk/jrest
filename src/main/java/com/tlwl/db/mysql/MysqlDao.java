@@ -44,7 +44,7 @@ public class MysqlDao {
             params.remove("search");
         }
         int page = params.has("page") ? Integer.parseInt(params.getString("page")) : 0;
-        int size = params.has("size") ? Integer.parseInt(params.getString("size")) : 0;
+        int size = params.has("size") ? Integer.parseInt(params.getString("size")) : GlobalConst.PAGESIZE;
         String order = params.has("order") ? params.getString("order") : "";
         JSONArray lks = params.has("lks") ? params.getJSONArray("lks") : null;
         JSONArray ins = params.has("ins") ? params.getJSONArray("ins") : null;
@@ -52,6 +52,15 @@ public class MysqlDao {
         JSONArray count = params.has("count") ? params.getJSONArray("count") : null;
         JSONArray sum = params.has("sum") ? params.getJSONArray("sum") : null;
         JSONArray ors = params.has("ors") ? params.getJSONArray("ors") : null;
+
+        if(params.has("group"))
+            params.remove("group");
+        if(params.has("ordery"))
+            params.remove("order");
+        if(params.has("page"))
+            params.remove("page");
+        if(params.has("size"))
+            params.remove("size");
 
         if(count != null){
             if(count.length() == 0 || count.length() % 2 == 1){
@@ -153,6 +162,13 @@ public class MysqlDao {
             if (where != "") {
                 sql += " WHERE " + where;
             }
+        }
+
+        if(group.length() > 0){
+            sql += " GROUP BY " + group;
+        }
+        if(order.length() > 0){
+            sql += " ORDER BY " + order;
         }
 
         return execQuery(sql, values);
