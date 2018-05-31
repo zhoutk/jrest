@@ -183,7 +183,7 @@ public class MysqlDao {
             String fls = "";
             if(fields != null && fields.length() > 0)
                 fls = fields.join(",").replaceAll("\"", "");
-            sql = "SELECT " + (fls.length() > 0 ? fls : (poly.length() > 0 ? "id" : "*")) + poly + " FROM " + tablename;
+            sql = "SELECT " + (fls.length() > 0 ? (fls + poly) : (poly.length() > 0 ? poly.substring(1) : "*")) + " FROM " + tablename;
             if (where != "") {
                 sql += " WHERE " + where;
             }
