@@ -1,6 +1,8 @@
 package com.tlwl.db.mysql;
 
+import com.mysql.cj.jdbc.ClientPreparedStatement;
 import com.tlwl.main.GlobalConst;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.lang3.RandomUtils;
@@ -28,6 +30,24 @@ public class MysqlDao {
             }
         }
         return conn[index];
+    }
+
+    public static JSONObject insert(String tablename, JSONObject params){
+        JSONArray values = new JSONArray();
+        Iterator<String> ks = params.keys();
+        String [] fls = new String[params.length()];
+        String [] vls = new String[params.length()];
+        int index = 0;
+        while (ks.hasNext()){
+            String key = ks.next();
+            fls[index] = key;
+            vls[index] = "?";
+            values.put(params.get(key));
+            index++;
+        }
+        String sql = "INSERT INTO " + tablename + " ( " + StringUtils.join(fls, ',') + " ) VALUES ( " + StringUtils.join(vls, ',') + " ) ";
+
+        return execQuery(sql, values);
     }
 
     public static JSONObject select(String tablename, JSONObject params, JSONArray fields) {  //String tablename, Object params, String [] fields
@@ -201,8 +221,9 @@ public class MysqlDao {
     }
 
     private static JSONObject execQuery(String sql, JSONArray values) {
-        Boolean flag = true;
-        int errorCode = 0;
+        Boolean flag = true, execFlag = true;
+        int errorCode = 0, updateCount = 0;
+        long new_id = 0;
         String errorMessage = "";
         Connection conn = createConnection();
         JSONArray json = new JSONArray();
@@ -220,7 +241,8 @@ public class MysqlDao {
             try {
                 stmt = conn.prepareStatement(sql);
                 ps.prepareStatement(stmt);
-                if (stmt.execute()) {
+                execFlag = stmt.execute();
+                if (execFlag) {
                     rs = stmt.getResultSet();
                     ResultSetMetaData rsmd = rs.getMetaData();
                     int columnCount = rsmd.getColumnCount();
@@ -241,6 +263,9 @@ public class MysqlDao {
                         json.put(jo);
                     }
                     System.out.println("SQL: " + sql + "; VALUES: " + values.toString());
+                }else{
+                    updateCount = stmt.getUpdateCount();
+                    new_id = ((ClientPreparedStatement) stmt).getLastInsertID();
                 }
             } catch (SQLException ex) {
                 flag = false;
@@ -270,9 +295,15 @@ public class MysqlDao {
         }
         JSONObject result = new JSONObject();
         if (flag) {
-            result.put("code", json.length() > 0 ? 200 : 602);
-            result.put("rows", json);
-            result.put("records", json.length());
+            if (execFlag) {               //是查询语句
+                result.put("code", json.length() > 0 ? 200 : 602);
+                result.put("rows", json);
+                result.put("records", json.length());
+            } else {                      //是执行语句
+                result.put("code", 200);
+                result.put("update_count", updateCount);
+                result.put("id", new_id);
+            }
         } else {
             result.put("code", 500);
             result.put("errcode", errorCode);

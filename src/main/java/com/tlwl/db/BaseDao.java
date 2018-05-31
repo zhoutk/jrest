@@ -13,4 +13,8 @@ public class BaseDao implements IDao {
         JSONObject rs = MysqlDao.select(this.table, params, null);
         return rs;
     }
+    public JSONObject create(String id, JSONObject params, JSONArray fields, Object session){
+        JSONObject rs = MysqlDao.insert(this.table, params);
+        return rs;
+    }
 }

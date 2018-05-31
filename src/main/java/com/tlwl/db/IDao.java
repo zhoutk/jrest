@@ -5,4 +5,5 @@ import org.json.JSONObject;
 
 public interface IDao {
     JSONObject retrieve(String id, JSONObject params, JSONArray fields, Object session);
+    JSONObject create(String id, JSONObject params, JSONArray fields, Object session);
 }
