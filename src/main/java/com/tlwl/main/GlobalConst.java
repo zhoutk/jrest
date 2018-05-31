@@ -10,4 +10,6 @@ public class GlobalConst {
     public final static JSONObject OPSUCCESS = CONSTS.getJSONObject("OPSUCCESS");
     public final static JSONObject ERRORS = CONSTS.getJSONObject("ERRORS");
     public final static int PAGESIZE = CONSTS.getInt("PAGESIZE");
+
+    public enum RESTMETHOD  { GET, POST, PUT, DELETE }
 }

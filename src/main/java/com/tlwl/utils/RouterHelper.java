@@ -13,17 +13,21 @@ import java.util.Map;
 
 public class RouterHelper {
     private final static String [] ParamsLimits = {"search", "page", "size", "order", "lks", "ins", "group", "count", "sum", "ors", "fields"};
-    public static String process(String tablename, Map queryParams, String id){
+    public static String process(String tablename, Map queryParams, GlobalConst.RESTMETHOD method, String id){
         JSONObject params = new JSONObject();
 
         for(Object al : queryParams.keySet()){
             String key = al.toString().toLowerCase();
-            LinkedList value = (LinkedList)queryParams.get(key);
+            LinkedList value = new LinkedList();
+            if(method == GlobalConst.RESTMETHOD.GET)
+                value = (LinkedList)queryParams.get(key);
+            else
+                value.push(key.endsWith("_json") ? (new JSONObject((Map)queryParams.get(key))) : queryParams.get(key));
             String[] arr = new String[value.size()];
             Object bl = value.removeFirst();
             int i = 0;
             do{
-                arr[i++] = (String) bl;
+                arr[i++] = bl.toString();
                 if(value.size() > 0)
                     bl = value.removeFirst();
                 else
@@ -52,11 +56,25 @@ public class RouterHelper {
         if(id.length() > 0)
             params.put("id", id);
         IDao dao = new BaseDao(tablename);
-        JSONObject rs = dao.retrieve(null, params, null, null);
+        JSONObject rs = null;
+        switch (method){
+            case GET:
+                rs = dao.retrieve(null, params, null, null);
+                break;
+            case POST:
+                rs = dao.create(null, params, null, null);
+                break;
+            case PUT:
+                rs = dao.retrieve(null, params, null, null);
+                break;
+            case DELETE:
+                rs = dao.retrieve(null, params, null, null);
+                break;
+        }
         return rs.toString();
     }
 
-    public static String process(String tablename, Map queryParams){
-        return process(tablename, queryParams, "");
+    public static String process(String tablename, Map queryParams, GlobalConst.RESTMETHOD method){
+        return process(tablename, queryParams, method, "");
     }
 }

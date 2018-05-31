@@ -1,13 +1,8 @@
 package com.tlwl.router;
 
 import com.tlwl.main.GlobalConst;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -42,16 +37,18 @@ public class BaseRs {
 
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{tablename}/{id}")
-    public String rsPost(@PathParam("tablename") String tablename, @PathParam("id") String id, @Context UriInfo ui){
+    public String rsPost(@PathParam("tablename") String tablename, @PathParam("id") String id, Object request){
         return GlobalConst.ERRORS.getJSONObject("204").toString();
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{tablename}")
-    public String rsPost(@PathParam("tablename") String tablename, @Context UriInfo ui){
+    public String rsPost(@PathParam("tablename") String tablename, Object request){
         return GlobalConst.ERRORS.getJSONObject("204").toString();
     }
 
