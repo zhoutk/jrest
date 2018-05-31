@@ -17,6 +17,7 @@ public class RouterHelper {
 
     public static String process(String tablename, Map queryParams, GlobalConst.RESTMETHOD method, String id) {
         JSONObject rs = null;
+        String errMessage = "";
         try {
             JSONObject params = new JSONObject();
 
@@ -60,7 +61,7 @@ public class RouterHelper {
             if (id.length() > 0)
                 params.put("id", id);
 
-            IDao dao = null;
+            IDao dao;
             String clsName = tablename.substring(0, 1).toUpperCase() + tablename.substring(1);
             try {
                 Class d1 = Class.forName("com.tlwl.dao." + clsName);
@@ -69,6 +70,7 @@ public class RouterHelper {
             }catch (Exception ex){
                 dao = new BaseDao(tablename);
                 if(!ex.toString().startsWith("java.lang.ClassNotFoundException")){
+                    errMessage = ex.getMessage();
                     ex.printStackTrace();
                 }
             }
@@ -87,7 +89,12 @@ public class RouterHelper {
                     break;
             }
         } catch (Exception ex) {
+            errMessage = ex.getMessage();
             ex.printStackTrace();
+        }
+        if(errMessage.length() > 0) {
+            rs.put("code", 500);
+            rs.put("message", errMessage);
         }
         return rs.toString();
     }
