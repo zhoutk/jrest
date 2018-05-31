@@ -22,4 +22,12 @@ public class BaseDao implements IDao {
         JSONObject rs = MysqlDao.insert(this.table, params);
         return rs;
     }
+    public JSONObject update(String id, JSONObject params, JSONArray fields, Object session){
+        JSONObject rs = MysqlDao.update(this.table, params, id);
+        return rs;
+    }
+    public JSONObject delete(String id, JSONObject params, JSONArray fields, Object session){
+        JSONObject rs = MysqlDao.insert(this.table, params);
+        return rs;
+    }
 }

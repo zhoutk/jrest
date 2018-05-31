@@ -67,16 +67,18 @@ public class BaseRs {
 
 
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{tablename}/{id}")
-    public String rsPut(@PathParam("tablename") String tablename, @PathParam("id") String id, @Context UriInfo ui){
+    public String rsPut(@PathParam("tablename") String tablename, @PathParam("id") String id, Object request){
         return GlobalConst.ERRORS.getJSONObject("204").toString();
     }
 
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{tablename}")
-    public String rsPut(@PathParam("tablename") String tablename, @Context UriInfo ui){
+    public String rsPut(@PathParam("tablename") String tablename, Object request){
         return GlobalConst.ERRORS.getJSONObject("404").toString();
     }
 

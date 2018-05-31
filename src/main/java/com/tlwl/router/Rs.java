@@ -47,5 +47,13 @@ public class Rs extends BaseRs {
     public String rsPost(@PathParam("tablename") String tablename, Object request){
         return RouterHelper.process(tablename, (Map)request, GlobalConst.RESTMETHOD.POST);
     }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{tablename}/{id}")
+    public String rsPut(@PathParam("tablename") String tablename, @PathParam("id") String id, Object request){
+        return RouterHelper.process(tablename, (Map)request, GlobalConst.RESTMETHOD.PUT, id);
+    }
 }
 

@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
+import static com.tlwl.main.GlobalConst.RESTMETHOD.*;
+
 public class RouterHelper {
     private final static String[] ParamsLimits = {"search", "page", "size", "order", "lks", "ins", "group", "count", "sum", "ors", "fields"};
 
@@ -27,7 +29,9 @@ public class RouterHelper {
                 if (method == GlobalConst.RESTMETHOD.GET)
                     value = (LinkedList) queryParams.get(key);
                 else
-                    value.push(key.endsWith("_json") ? (new JSONObject((Map) queryParams.get(key))) : queryParams.get(key));
+                    value.push(key.endsWith("_json") ? (queryParams.get(key).toString().startsWith("[") ?
+                            new JSONArray((java.util.Collection<Object>)queryParams.get(key)) :
+                            new JSONObject((Map) queryParams.get(key))) : queryParams.get(key));
                 String[] arr = new String[value.size()];
                 Object bl = value.removeFirst();
                 int i = 0;
@@ -58,7 +62,7 @@ public class RouterHelper {
                 } else
                     params.put(key, StringUtils.join(arr, ','));
             }
-            if (id.length() > 0)
+            if (id.length() > 0 && (method == POST || method == GET))
                 params.put("id", id);
 
             IDao dao;
@@ -82,10 +86,10 @@ public class RouterHelper {
                     rs = dao.create(null, params, null, null);
                     break;
                 case PUT:
-                    rs = dao.retrieve(null, params, null, null);
+                    rs = dao.update(id, params, null, null);
                     break;
                 case DELETE:
-                    rs = dao.retrieve(null, params, null, null);
+                    rs = dao.delete(id, params, null, null);
                     break;
             }
         } catch (Exception ex) {

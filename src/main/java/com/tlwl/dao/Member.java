@@ -8,6 +8,7 @@ public class Member extends BaseDao {
     private String table;
     public Member(){
         super("");
+        this.table = "";
     }
     public Member(String tablename){
         super(tablename);

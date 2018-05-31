@@ -32,13 +32,26 @@ public class MysqlDao {
         return conn[index];
     }
 
-    public static JSONObject insert(String tablename, JSONObject params){
+    public static JSONObject update(String tablename, JSONObject params, String id) {
         JSONArray values = new JSONArray();
         Iterator<String> ks = params.keys();
-        String [] fls = new String[params.length()];
-        String [] vls = new String[params.length()];
+        String sql = "UPDATE " + tablename + " SET ";
+        while (ks.hasNext()) {
+            String key = ks.next();
+            values.put(params.get(key));
+            sql += key + " = ?" + (ks.hasNext() ? ", " : " WHERE id = ? ");
+        }
+        values.put(id);
+        return execQuery(sql, values).put("id", id);
+    }
+
+    public static JSONObject insert(String tablename, JSONObject params) {
+        JSONArray values = new JSONArray();
+        Iterator<String> ks = params.keys();
+        String[] fls = new String[params.length()];
+        String[] vls = new String[params.length()];
         int index = 0;
-        while (ks.hasNext()){
+        while (ks.hasNext()) {
             String key = ks.next();
             fls[index] = key;
             vls[index] = "?";
@@ -74,25 +87,25 @@ public class MysqlDao {
         JSONArray sum = params.has("sum") ? params.getJSONArray("sum") : null;
         JSONArray ors = params.has("ors") ? params.getJSONArray("ors") : null;
 
-        if(params.has("fields"))
+        if (params.has("fields"))
             params.remove("fields");
-        if(params.has("group"))
+        if (params.has("group"))
             params.remove("group");
-        if(params.has("order"))
+        if (params.has("order"))
             params.remove("order");
-        if(params.has("page"))
+        if (params.has("page"))
             params.remove("page");
-        if(params.has("size"))
+        if (params.has("size"))
             params.remove("size");
 
-        if(count != null){
-            if(count.length() == 0 || count.length() % 2 == 1){
+        if (count != null) {
+            if (count.length() == 0 || count.length() % 2 == 1) {
                 return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of count is error.");
             }
             params.remove("count");
         }
-        if(sum != null){
-            if(sum.length() == 0 || sum.length() % 2 == 1){
+        if (sum != null) {
+            if (sum.length() == 0 || sum.length() % 2 == 1) {
                 return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of sum is error.");
             }
             params.remove("sum");
@@ -102,60 +115,60 @@ public class MysqlDao {
         while (ks.hasNext()) {
             String key = ks.next();
             if (!where.isEmpty())
-                    where += " and ";
+                where += " and ";
 
-            if(key.equals("ins")){
-                if(ins.length() < 2){
+            if (key.equals("ins")) {
+                if (ins.length() < 2) {
                     return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ins is error.");
                 }
                 String c = ins.remove(0).toString();
                 where += c + " in ( ";
-                do{
+                do {
                     values.put(ins.remove(0));
                     where += "?" + (ins.length() > 0 ? "," : "");
-                }while(ins.length() > 0);
+                } while (ins.length() > 0);
                 where += " ) ";
-            }else if(key.equals("lks")){
-                if(lks.length() < 2){
+            } else if (key.equals("lks")) {
+                if (lks.length() < 2) {
                     return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of lks is error.");
                 }
                 String val = lks.remove(0).toString();
                 where += " ( ";
-                do{
+                do {
                     where += lks.remove(0).toString() + " like ? ";
                     where += lks.length() > 0 ? " or " : "";
                     values.put("%" + val + "%");
-                }while (lks.length() > 0);
+                } while (lks.length() > 0);
                 where += " ) ";
-            }else if(key.equals("ors")){
-                if(ors.length() < 2 || ors.length() % 2 == 1){
+            } else if (key.equals("ors")) {
+                if (ors.length() < 2 || ors.length() % 2 == 1) {
                     return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ors is error.");
                 }
                 where += " ( ";
-                do{
+                do {
                     where += ors.remove(0).toString() + " = ? ";
                     values.put(ors.remove(0));
                     where += ors.length() > 0 ? " or " : "";
-                }while (ors.length() > 0);
+                } while (ors.length() > 0);
                 where += " ) ";
-            } else{
-                String  value = params.getString(key);
-                if(value.startsWith("<,") || value.startsWith("<=,") || value.startsWith(">,") ||
-                        value.startsWith(">=,") || value.startsWith("<>,") || value.startsWith("=,")){
+            } else {
+                String value = params.getString(key);
+                if (value.startsWith("<,") || value.startsWith("<=,") || value.startsWith(">,") ||
+                        value.startsWith(">=,") || value.startsWith("<>,") || value.startsWith("=,")) {
                     String[] vls = value.split(",");
-                    if(vls.length == 2){
+                    if (vls.length == 2) {
                         where += key + vls[0] + " ? ";
                         values.put(vls[1]);
-                    }else if(vls.length == 4){
+                    } else if (vls.length == 4) {
                         where += key + vls[0] + " ? and " + key + vls[2] + " ? ";
                         values.put(vls[1]);
                         values.put(vls[3]);
-                    }else{
-                        if(where.endsWith(" and ")){
+                    } else {
+                        if (where.endsWith(" and ")) {
                             where = where.substring(0, where.length() - 4);
                         }
                     }
-                }else if (is_search) {
+                } else if (is_search) {
                     where += key + " like ? ";
                     values.put("%" + value + "%");
                 } else {
@@ -166,22 +179,22 @@ public class MysqlDao {
         }
 
         String poly = "";
-        if(count != null){
-            do{
+        if (count != null) {
+            do {
                 poly += ",count(" + count.remove(0) + ") as " + count.remove(0) + " ";
-            }while (count.length() > 0);
+            } while (count.length() > 0);
         }
-        if(sum != null){
-            do{
+        if (sum != null) {
+            do {
                 poly += ",sum(" + sum.remove(0) + ") as " + sum.remove(0) + " ";
-            }while (sum.length() > 0);
+            } while (sum.length() > 0);
         }
 
         if (tablename == "QuerySqlSelect") {
             sql += "";
         } else {
             String fls = "";
-            if(fields != null && fields.length() > 0)
+            if (fields != null && fields.length() > 0)
                 fls = fields.join(",").replaceAll("\"", "");
             sql = "SELECT " + (fls.length() > 0 ? (fls + poly) : (poly.length() > 0 ? poly.substring(1) : "*")) + " FROM " + tablename;
             if (where != "") {
@@ -189,14 +202,14 @@ public class MysqlDao {
             }
         }
 
-        if(group.length() > 0){
+        if (group.length() > 0) {
             sql += " GROUP BY " + group;
         }
-        if(order.length() > 0){
+        if (order.length() > 0) {
             sql += " ORDER BY " + order;
         }
 
-        if(page > 0){
+        if (page > 0) {
             page--;
             String sql1 = sql + " LIMIT " + page * size + "," + size;
             int index = sql.toUpperCase().lastIndexOf(" FROM ");
@@ -205,15 +218,15 @@ public class MysqlDao {
             JSONObject rs1 = execQuery(sql1, values);
             JSONObject rs2 = execQuery(sql2, values);
             int ct = 0;
-            if(rs2.getInt("code") == 200 && group.length() == 0){
+            if (rs2.getInt("code") == 200 && group.length() == 0) {
                 ct = rs2.getJSONArray("rows").getJSONObject(0).getInt("count");
-            }else if(group.length() > 0){
+            } else if (group.length() > 0) {
                 ct = rs2.getJSONArray("rows").length();
             }
-            rs1.put("count", Math.ceil(ct /size));
+            rs1.put("count", Math.ceil(ct / size));
             rs1.put("records", ct);
             return rs1;
-        }else{
+        } else {
             JSONObject rs = execQuery(sql, values);
             rs.put("count", rs.getInt("code") == 200 ? 1 : 0);
             return rs;
@@ -262,11 +275,11 @@ public class MysqlDao {
                         }
                         json.put(jo);
                     }
-                    System.out.println("SQL: " + sql + "; VALUES: " + values.toString());
-                }else{
+                } else {
                     updateCount = stmt.getUpdateCount();
                     new_id = ((ClientPreparedStatement) stmt).getLastInsertID();
                 }
+                System.out.println("SQL: " + sql + "; VALUES: " + values.toString());
             } catch (SQLException ex) {
                 flag = false;
                 errorCode = ex.getErrorCode();
