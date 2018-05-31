@@ -27,7 +27,7 @@ public class BaseDao implements IDao {
         return rs;
     }
     public JSONObject delete(String id, JSONObject params, JSONArray fields, Object session){
-        JSONObject rs = MysqlDao.insert(this.table, params);
+        JSONObject rs = MysqlDao.delete(this.table, id);
         return rs;
     }
 }

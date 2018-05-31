@@ -32,6 +32,13 @@ public class MysqlDao {
         return conn[index];
     }
 
+    public static JSONObject delete(String tablename, String id){
+        JSONArray values = new JSONArray();
+        String sql = "DELETE from " + tablename + " WHERE id = ? ";
+        values.put(id);
+        return execQuery(sql, values).put("id", id);
+    }
+
     public static JSONObject update(String tablename, JSONObject params, String id) {
         JSONArray values = new JSONArray();
         Iterator<String> ks = params.keys();

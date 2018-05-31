@@ -26,7 +26,7 @@ public class RouterHelper {
             for (Object al : queryParams.keySet()) {
                 String key = al.toString().toLowerCase();
                 LinkedList value = new LinkedList();
-                if (method == GlobalConst.RESTMETHOD.GET)
+                if (method == GET || method == DELETE)
                     value = (LinkedList) queryParams.get(key);
                 else
                     value.push(key.endsWith("_json") ? (queryParams.get(key).toString().startsWith("[") ?
