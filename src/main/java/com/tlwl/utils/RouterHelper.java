@@ -18,6 +18,10 @@ public class RouterHelper {
     private final static String[] ParamsLimits = {"search", "page", "size", "order", "lks", "ins", "group", "count", "sum", "ors", "fields"};
 
     public static String process(String tablename, Map queryParams, GlobalConst.RESTMETHOD method, String id) {
+        return process(tablename, queryParams, method, id, null);
+    }
+
+    public static String process(String tablename, Map queryParams, GlobalConst.RESTMETHOD method, String id, JSONObject session) {
         JSONObject rs = null;
         String errMessage = "";
         try {
@@ -80,16 +84,16 @@ public class RouterHelper {
             }
             switch (method) {
                 case GET:
-                    rs = dao.retrieve(null, params, null, null);
+                    rs = dao.retrieve(null, params, null, session);
                     break;
                 case POST:
-                    rs = dao.create(null, params, null, null);
+                    rs = dao.create(null, params, null, session);
                     break;
                 case PUT:
-                    rs = dao.update(id, params, null, null);
+                    rs = dao.update(id, params, null, session);
                     break;
                 case DELETE:
-                    rs = dao.delete(id, params, null, null);
+                    rs = dao.delete(id, params, null, session);
                     break;
             }
         } catch (Exception ex) {
