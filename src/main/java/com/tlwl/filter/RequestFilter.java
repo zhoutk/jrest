@@ -11,10 +11,10 @@ public class RequestFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String token = requestContext.getHeaderString("Authorization");
-        if(token.length() > 4){
+        if(token != null && token.length() > 4){
             token = token.substring(4);
             JSONObject payload = Tools.decodeJsonWebToken(token);
-            requestContext.setProperty("session", payload.toString());
+            requestContext.setProperty("session", payload);
         }
     }
 }

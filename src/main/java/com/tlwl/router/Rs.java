@@ -47,7 +47,7 @@ public class Rs extends BaseRs {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{tablename}")
     public String rsPost(@PathParam("tablename") String tablename, @Context ContainerRequestContext cxt, Object request){
-        JSONObject session = new JSONObject(cxt.getProperty("session").toString());
+        JSONObject session = (JSONObject) cxt.getProperty("session");
         return RouterHelper.process(tablename, (Map)request, GlobalConst.RESTMETHOD.POST);
     }
 
