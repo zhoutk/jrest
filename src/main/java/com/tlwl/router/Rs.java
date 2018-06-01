@@ -4,6 +4,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.UriInfo;
 
 import com.tlwl.main.GlobalConst;
 import com.tlwl.utils.RouterHelper;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -44,7 +46,8 @@ public class Rs extends BaseRs {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{tablename}")
-    public String rsPost(@PathParam("tablename") String tablename, Object request){
+    public String rsPost(@PathParam("tablename") String tablename, @Context ContainerRequestContext cxt, Object request){
+        JSONObject session = new JSONObject(cxt.getProperty("session").toString());
         return RouterHelper.process(tablename, (Map)request, GlobalConst.RESTMETHOD.POST);
     }
 

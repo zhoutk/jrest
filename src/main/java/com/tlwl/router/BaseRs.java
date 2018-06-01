@@ -3,6 +3,7 @@ package com.tlwl.router;
 import com.tlwl.main.GlobalConst;
 
 import javax.ws.rs.*;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -48,7 +49,7 @@ public class BaseRs {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{tablename}")
-    public String rsPost(@PathParam("tablename") String tablename, Object request){
+    public String rsPost(@PathParam("tablename") String tablename, @Context ContainerRequestContext cxt, Object request){
         return GlobalConst.ERRORS.getJSONObject("204").toString();
     }
 

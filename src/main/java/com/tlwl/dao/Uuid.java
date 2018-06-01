@@ -1,6 +1,7 @@
 package com.tlwl.dao;
 
 import com.tlwl.db.BaseDao;
+import com.tlwl.utils.Tools;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import static com.tlwl.main.GlobalConst.uuid;
@@ -17,6 +18,7 @@ public class Uuid extends BaseDao {
     }
 
     public JSONObject retrieve(String id, JSONObject params, JSONArray fields, Object session){
-        return new JSONObject("{\"id\":\""+uuid()+"\"}");
+        String dd = Tools.encodeJsonWebToken(new JSONObject("{\"userid\":\"abcddcdb\",\"iat\":1527838859}"));
+        return new JSONObject("{\"payload\":\""+dd+"\"}");
     }
 }
