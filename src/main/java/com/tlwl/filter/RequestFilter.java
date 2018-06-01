@@ -3,18 +3,17 @@ package com.tlwl.filter;
 import com.tlwl.utils.Tools;
 import org.json.JSONObject;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
-public class RequestFilter implements ContainerRequestFilter {
-    @Context UriInfo ui;
+@Provider
+public class RequestFilter implements ContainerResponseFilter {
     @Override
-    public void filter(ContainerRequestContext requestContext) {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         String token = requestContext.getHeaderString("Authorization");
         if(token != null && token.length() > 4){                        //session valid
             token = token.substring(4);
@@ -23,5 +22,8 @@ public class RequestFilter implements ContainerRequestFilter {
         }else{                                                          //session not valid
 
         }
+
+        responseContext.setEntity(requestContext.getProperty("session").toString(),null,MediaType.APPLICATION_JSON_TYPE);
+        System.out.println(requestContext.getProperty("session").toString());
     }
 }
