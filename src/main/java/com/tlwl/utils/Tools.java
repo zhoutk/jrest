@@ -12,6 +12,15 @@ import org.json.JSONObject;
 import org.json.JSONException;
 
 public class Tools {
+    public static String underlineToCamel(String source){
+        String rs = "";
+        String[] words = source.split("_");
+        for(int i = 0; i < words.length; i++){
+            rs += words[i].substring(0,1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+        return rs;
+    }
+
     public static String encodeJsonWebToken(JSONObject payload) {
         return Jwts.builder()
                 .setPayload(payload.toString())

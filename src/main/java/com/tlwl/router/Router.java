@@ -64,7 +64,7 @@ public class Router implements ContainerResponseFilter {
 
             if(urls[0].equals("rs")) {
                 IDao dao;
-                String clsName = tablename.substring(0, 1).toUpperCase() + tablename.substring(1);
+                String clsName = Tools.underlineToCamel(tablename);
                 try {
                     Class cls = Class.forName("com.tlwl.dao." + clsName);
                     Constructor constructor = cls.getConstructor(String.class);
@@ -92,7 +92,7 @@ public class Router implements ContainerResponseFilter {
                 }
             }else{
                 try {
-                    Class cls = Class.forName("com.tlwl.auth." + urls[0].substring(0, 1).toUpperCase() + urls[0].substring(1));
+                    Class cls = Class.forName("com.tlwl.auth." + Tools.underlineToCamel(urls[0]));
                     Constructor constructor = cls.getConstructor();
                     Object obj = constructor.newInstance();
                     Method sf = cls.getMethod(urls[1], params.getClass() , payload.getClass());

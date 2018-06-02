@@ -12,10 +12,10 @@ public class BaseDao implements IDao {
     public BaseDao(){
         this.table = "";
     }
-
     public BaseDao(String tablename){
         this.table = tablename;
     }
+
     public JSONObject retrieve(String id, JSONObject params, JSONArray fields, JSONObject session){
         JSONObject rs = MysqlDao.select(this.table, params, null);
         return rs;
