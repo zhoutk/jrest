@@ -35,13 +35,17 @@ public class Router implements ContainerResponseFilter {
                 setResponse(req, GlobalConst.ERRORS.getJSONObject("601").toString());
                 return;
             }
-            if(method.equals("POST") || method.equals("PUT"))
+            if(method.equals("POST") || method.equals("PUT") && urLen == 3)
             {
                 params = RouterHelper.getBodyParams(res);
-            }else if(method.equals("GET") || method.equals("DELETE")){
+            }else if(method.equals("GET") || method.equals("DELETE") && urLen == 3){
                 params = RouterHelper.getQueryParams(res.getUriInfo().getQueryParameters());
             }else {
                 setResponse(req, GlobalConst.ERRORS.getJSONObject("404").toString());
+                return;
+            }
+            if((method.equals("POST") || method.equals("PUT")) &&(params == null || params.length() == 0)){
+                setResponse(req, GlobalConst.ERRORS.getJSONObject("301").toString());
                 return;
             }
             if(urLen > 2){
