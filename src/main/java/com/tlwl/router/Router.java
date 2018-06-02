@@ -110,7 +110,6 @@ public class Router implements ContainerResponseFilter {
             setResponse(req, GlobalConst.ERRORS.getJSONObject("500").put("message", errMessage).toString());
         }else
             setResponse(req, rs.toString());
-        System.out.println(payload == null ? "{}" : payload.toString());
     }
 
     private void setResponse(ContainerResponseContext req, String payload){
