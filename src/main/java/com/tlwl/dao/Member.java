@@ -14,7 +14,7 @@ public class Member extends BaseDao {
         super(tablename);
         this.table = tablename;
     }
-    public JSONObject retrieve(String id, JSONObject params, JSONArray fields, Object session){
+    public JSONObject retrieve(String id, JSONObject params, JSONArray fields, JSONObject session){
         JSONObject rs = new BaseDao(this.table).retrieve(id, params, fields, session);
         return rs;
     }

@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 @Provider
@@ -25,10 +26,10 @@ public class Router implements ContainerResponseFilter {
         JSONObject rs = null;
         JSONObject payload = null, params = null;
         String id = null;
+        res.setProperty("session", "{}");                               //important
         if(token != null && token.length() > 4){                        //decode jwt payload
             token = token.substring(4);
             payload = Tools.decodeJsonWebToken(token);
-            res.setProperty("session", payload == null ? "{}" : payload);
         }
 
         String method = res.getMethod();
@@ -61,38 +62,50 @@ public class Router implements ContainerResponseFilter {
                 }
             }
 
-            IDao dao;
-            String clsName = tablename.substring(0, 1).toUpperCase() + tablename.substring(1);
-            try {
-                Class d1 = Class.forName("com.tlwl.dao." + clsName);
-                Constructor constructor = d1.getConstructor(String.class);
-                dao = (IDao) constructor.newInstance(tablename);
-            }catch (Exception ex){
-                dao = new BaseDao(tablename);
-                if(!ex.toString().startsWith("java.lang.ClassNotFoundException")){
+            if(urls[0].equals("rs")) {
+                IDao dao;
+                String clsName = tablename.substring(0, 1).toUpperCase() + tablename.substring(1);
+                try {
+                    Class cls = Class.forName("com.tlwl.dao." + clsName);
+                    Constructor constructor = cls.getConstructor(String.class);
+                    dao = (IDao) constructor.newInstance(tablename);
+                } catch (Exception ex) {
+                    dao = new BaseDao(tablename);
+                    if (!ex.toString().startsWith("java.lang.ClassNotFoundException")) {
+                        errMessage = ex.getMessage();
+                        ex.printStackTrace();
+                    }
+                }
+                switch (method) {
+                    case "GET":
+                        rs = dao.retrieve(null, params, null, payload);
+                        break;
+                    case "POST":
+                        rs = dao.create(null, params, null, payload);
+                        break;
+                    case "PUT":
+                        rs = dao.update(id, params, null, payload);
+                        break;
+                    case "DELETE":
+                        rs = dao.delete(id, params, null, payload);
+                        break;
+                }
+            }else{
+                try {
+                    Class cls = Class.forName("com.tlwl.auth." + urls[0].substring(0, 1).toUpperCase() + urls[0].substring(1));
+                    Constructor constructor = cls.getConstructor();
+                    Object obj = constructor.newInstance();
+                    Method sf = cls.getMethod(urls[1], params.getClass() , payload.getClass());
+                    rs = (JSONObject) sf.invoke(obj, params, payload);
+                }catch (Exception ex){
                     errMessage = ex.getMessage();
                     ex.printStackTrace();
                 }
             }
-            switch (method) {
-                case "GET":
-                    rs = dao.retrieve(null, params, null, payload);
-                    break;
-                case "POST":
-                    rs = dao.create(null, params, null, payload);
-                    break;
-                case "PUT":
-                    rs = dao.update(id, params, null, payload);
-                    break;
-                case "DELETE":
-                    rs = dao.delete(id, params, null, payload);
-                    break;
-            }
-
         }else{          //404
             setResponse(req, GlobalConst.ERRORS.getJSONObject("404").toString());
+            return;
         }
-
         if(errMessage.length() > 0){            //异常
             setResponse(req, GlobalConst.ERRORS.getJSONObject("500").put("message", errMessage).toString());
         }else

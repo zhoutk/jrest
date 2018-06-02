@@ -16,6 +16,10 @@
       "code": 404,
       "err": "the rest api is not exist."
     },
+    "500": {
+      "code": 500,
+      "err": "the exception has thrown."
+    },
     "601": {
       "code": 601,
       "err": "You must login first."
