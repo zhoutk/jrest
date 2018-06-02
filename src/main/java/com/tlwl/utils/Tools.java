@@ -25,12 +25,12 @@ public class Tools {
             Claims payload = Jwts.parser().setSigningKey(GlobalConst.JWT_KEY)
                     .parseClaimsJws(pass).getBody();
             rs = new JSONObject(payload);
-            if(!rs.has("iat") ||
-                    System.currentTimeMillis()/1000 - rs.getInt("iat") > GlobalConst.CONFIGS.getInt("session_overdue_second") ||
-                    !rs.has("copyright") ||
-                    !rs.getString("copyright").equals(GlobalConst.CONFIGS.getString("copyright"))){
-                rs = null;
-            }
+//            if(!rs.has("iat") ||
+//                    System.currentTimeMillis()/1000 - rs.getInt("iat") > GlobalConst.CONFIGS.getInt("session_overdue_second") ||
+//                    !rs.has("copyright") ||
+//                    !rs.getString("copyright").equals(GlobalConst.CONFIGS.getString("copyright"))){
+//                rs = null;
+//            }
         } catch (Exception ex){}
         return rs;
     }
