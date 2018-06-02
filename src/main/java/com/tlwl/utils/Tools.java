@@ -20,14 +20,19 @@ public class Tools {
     }
 
     public static JSONObject decodeJsonWebToken(String pass) {
-        Claims payload = null;
+        JSONObject rs = null;
         try {
-            payload = Jwts.parser().setSigningKey(GlobalConst.JWT_KEY)
+            Claims payload = Jwts.parser().setSigningKey(GlobalConst.JWT_KEY)
                     .parseClaimsJws(pass).getBody();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return new JSONObject(payload);
+            rs = new JSONObject(payload);
+            if(!rs.has("iat") ||
+                    System.currentTimeMillis()/1000 - rs.getInt("iat") > GlobalConst.CONFIGS.getInt("session_overdue_second") ||
+                    !rs.has("copyright") ||
+                    !rs.getString("copyright").equals(GlobalConst.CONFIGS.getString("copyright"))){
+                rs = null;
+            }
+        } catch (Exception ex){}
+        return rs;
     }
 
     public static JSONObject jsonRead(String file) {

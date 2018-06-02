@@ -1,6 +1,6 @@
 package com.tlwl.main;
 
-import com.tlwl.filter.RequestFilter;
+import com.tlwl.router.Router;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -13,7 +13,7 @@ public class App {
     public static HttpServer startServer() {
         // create a resource config that scans for JAX-RS resources and providers
         // in com.example package
-        final ResourceConfig rc = new ResourceConfig().register(RequestFilter.class);
+        final ResourceConfig rc = new ResourceConfig().register(Router.class);
 
         // create and start a new instance of grizzly http server
         // exposing the Jersey application at BASE_URI

@@ -18,7 +18,7 @@ public class Uuid extends BaseDao {
     }
 
     public JSONObject retrieve(String id, JSONObject params, JSONArray fields, Object session){
-        String dd = Tools.encodeJsonWebToken(new JSONObject("{\"userid\":\"abcddcdb\",\"iat\":1527838859}"));
+        String dd = Tools.encodeJsonWebToken(new JSONObject("{\"userid\":\"abcddcdb\",\"iat\":"+Math.floor(System.currentTimeMillis()/1000)+"}"));
         return new JSONObject("{\"payload\":\""+dd+"\"}");
     }
 }

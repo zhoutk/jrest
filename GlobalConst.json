@@ -15,6 +15,10 @@
     "404": {
       "code": 404,
       "err": "the rest api is not exist."
+    },
+    "601": {
+      "code": 601,
+      "err": "You must login first."
     }
   },
   "PAGESIZE":10
