@@ -16,11 +16,11 @@ public class BaseDao implements IDao {
     public BaseDao(String tablename){
         this.table = tablename;
     }
-    public JSONObject retrieve(String id, JSONObject params, JSONArray fields, Object session){
+    public JSONObject retrieve(String id, JSONObject params, JSONArray fields, JSONObject session){
         JSONObject rs = MysqlDao.select(this.table, params, null);
         return rs;
     }
-    public JSONObject create(String id, JSONObject params, JSONArray fields, Object session){
+    public JSONObject create(String id, JSONObject params, JSONArray fields, JSONObject session){
         boolean is_auto_id = params.has("auto_id") && params.get("auto_id").toString().equals("1");
         if(!params.has("id")){                          //即ID不存在，因为参数处理时，若ID存在，就已经加入参数中
             if(!is_auto_id){
@@ -35,11 +35,11 @@ public class BaseDao implements IDao {
             rs.put("id", id);
         return rs;
     }
-    public JSONObject update(String id, JSONObject params, JSONArray fields, Object session){
+    public JSONObject update(String id, JSONObject params, JSONArray fields, JSONObject session){
         JSONObject rs = MysqlDao.update(this.table, params, id);
         return rs;
     }
-    public JSONObject delete(String id, JSONObject params, JSONArray fields, Object session){
+    public JSONObject delete(String id, JSONObject params, JSONArray fields, JSONObject session){
         JSONObject rs = MysqlDao.delete(this.table, id);
         return rs;
     }
