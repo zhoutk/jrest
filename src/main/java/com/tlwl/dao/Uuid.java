@@ -9,7 +9,7 @@ import static com.tlwl.main.GlobalConst.uuid;
 public class Uuid extends BaseDao {
     private String table;
     public Uuid(){
-        super("");
+        super();
         this.table = "";
     }
     public Uuid(String tablename){
@@ -17,7 +17,7 @@ public class Uuid extends BaseDao {
         this.table = tablename;
     }
 
-    public JSONObject retrieve(String id, JSONObject params, JSONArray fields, Object session){
+    public JSONObject retrieve(String id, JSONObject params, JSONArray fields, JSONObject session){
         String dd = Tools.encodeJsonWebToken(new JSONObject("{\"copyright\":\"tlwl\",\"iat\":"+Math.floor(System.currentTimeMillis()/1000)+"}"));
         return new JSONObject("{\"payload\":\""+dd+"\"}");
     }

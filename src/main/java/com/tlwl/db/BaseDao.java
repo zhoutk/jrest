@@ -8,6 +8,7 @@ import static com.tlwl.main.GlobalConst.uuid;
 
 public class BaseDao implements IDao {
     private String table;
+    public BaseDao(){ this.table = ""; }
     public BaseDao(String tablename){
         this.table = tablename;
     }

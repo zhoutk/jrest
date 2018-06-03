@@ -7,7 +7,7 @@ import org.json.JSONObject;
 public class Member extends BaseDao {
     private String table;
     public Member(){
-        super("");
+        super();
         this.table = "";
     }
     public Member(String tablename){
