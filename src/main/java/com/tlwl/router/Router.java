@@ -39,7 +39,7 @@ public class Router implements ContainerResponseFilter {
         if(urLen > 1 && urLen < 4 && Arrays.asList(cmds).contains(urls[0])){
             String tablename = urls[1];
             if(payload == null && method != "GET" && urls[0].equals("rs")){
-                setResponse(req, GlobalConst.ERRORS.getJSONObject("601").toString());
+                setResponse(req, GlobalConst.getErrorsJSON(601).toString());
                 return;
             }
             if(method.equals("POST") || method.equals("PUT") && urLen == 3)
@@ -48,11 +48,11 @@ public class Router implements ContainerResponseFilter {
             }else if(method.equals("GET") || method.equals("DELETE") && urLen == 3){
                 params = RouterHelper.getQueryParams(res.getUriInfo().getQueryParameters());
             }else {
-                setResponse(req, GlobalConst.ERRORS.getJSONObject("404").toString());
+                setResponse(req, GlobalConst.getErrorsJSON(404).toString());
                 return;
             }
             if((method.equals("POST") || method.equals("PUT")) &&(params == null || params.length() == 0)){
-                setResponse(req, GlobalConst.ERRORS.getJSONObject("301").toString());
+                setResponse(req, GlobalConst.getErrorsJSON(301).toString());
                 return;
             }
             if(urLen > 2){
@@ -103,11 +103,11 @@ public class Router implements ContainerResponseFilter {
                 }
             }
         }else{          //404
-            setResponse(req, GlobalConst.ERRORS.getJSONObject("404").toString());
+            setResponse(req, GlobalConst.getErrorsJSON(404).toString());
             return;
         }
         if(errMessage.length() > 0){            //异常
-            setResponse(req, GlobalConst.ERRORS.getJSONObject("500").put("message", errMessage).toString());
+            setResponse(req, GlobalConst.getErrorsJSON(500).put("message", errMessage).toString());
         }else
             setResponse(req, rs.toString());
     }

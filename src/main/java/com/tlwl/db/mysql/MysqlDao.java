@@ -107,13 +107,13 @@ public class MysqlDao {
 
         if (count != null) {
             if (count.length() == 0 || count.length() % 2 == 1) {
-                return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of count is error.");
+                return GlobalConst.getErrorsJSON(301).put("message", "Format of count is error.");
             }
             params.remove("count");
         }
         if (sum != null) {
             if (sum.length() == 0 || sum.length() % 2 == 1) {
-                return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of sum is error.");
+                return GlobalConst.getErrorsJSON(301).put("message", "Format of sum is error.");
             }
             params.remove("sum");
         }
@@ -126,7 +126,7 @@ public class MysqlDao {
 
             if (key.equals("ins")) {
                 if (ins.length() < 2) {
-                    return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ins is error.");
+                    return GlobalConst.getErrorsJSON(301).put("message", "Format of ins is error.");
                 }
                 String c = ins.remove(0).toString();
                 where += c + " in ( ";
@@ -137,7 +137,7 @@ public class MysqlDao {
                 where += " ) ";
             } else if (key.equals("lks")) {
                 if (lks.length() < 2) {
-                    return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of lks is error.");
+                    return GlobalConst.getErrorsJSON(301).put("message", "Format of lks is error.");
                 }
                 String val = lks.remove(0).toString();
                 where += " ( ";
@@ -149,7 +149,7 @@ public class MysqlDao {
                 where += " ) ";
             } else if (key.equals("ors")) {
                 if (ors.length() < 2 || ors.length() % 2 == 1) {
-                    return GlobalConst.ERRORS.getJSONObject("301").put("message", "Format of ors is error.");
+                    return GlobalConst.getErrorsJSON(301).put("message", "Format of ors is error.");
                 }
                 where += " ( ";
                 do {

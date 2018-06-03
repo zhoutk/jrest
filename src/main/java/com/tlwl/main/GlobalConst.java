@@ -27,8 +27,6 @@ public class GlobalConst {
     public final static JSONObject CONFIGS = Tools.jsonRead("./configs.json");
 
     private final static JSONObject CONSTS = Tools.jsonRead("./GlobalConst.json");
-    public final static JSONObject OPSUCCESS = CONSTS.getJSONObject("OPSUCCESS");
-    public final static JSONObject ERRORS = CONSTS.getJSONObject("ERRORS");
     public final static int PAGESIZE = CONSTS.getInt("PAGESIZE");
 
     public static String uuid(){
@@ -37,5 +35,11 @@ public class GlobalConst {
 
     public final static SecretKey JWT_KEY = generalKey(CONFIGS.getString("jwt_secret"));
 
+    public  static JSONObject getErrorsJSON(int code){
+        return new JSONObject(CONSTS.getJSONObject("ERRORS").get(Integer.valueOf(code).toString()).toString());
+    }
 
+    public  static JSONObject getSuccessJSON(){
+        return  new JSONObject(CONSTS.getJSONObject("OPSUCCESS").toString());
+    }
 }

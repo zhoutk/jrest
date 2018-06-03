@@ -8,16 +8,12 @@ import static com.tlwl.main.GlobalConst.uuid;
 
 public class BaseDao implements IDao {
     private String table;
-
-    public BaseDao(){
-        this.table = "";
-    }
     public BaseDao(String tablename){
         this.table = tablename;
     }
 
     public JSONObject retrieve(String id, JSONObject params, JSONArray fields, JSONObject session){
-        JSONObject rs = MysqlDao.select(this.table, params, null);
+        JSONObject rs = MysqlDao.select(this.table, params, fields);
         return rs;
     }
     public JSONObject create(String id, JSONObject params, JSONArray fields, JSONObject session){
