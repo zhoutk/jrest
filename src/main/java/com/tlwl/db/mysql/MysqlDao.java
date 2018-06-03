@@ -45,7 +45,7 @@ public class MysqlDao {
         String sql = "UPDATE " + tablename + " SET ";
         while (ks.hasNext()) {
             String key = ks.next();
-            values.put(params.get(key));
+            values.put(key.endsWith("_json") ? params.get(key).toString() : params.get(key));
             sql += key + " = ?" + (ks.hasNext() ? ", " : " WHERE id = ? ");
         }
         values.put(id);
@@ -62,7 +62,7 @@ public class MysqlDao {
             String key = ks.next();
             fls[index] = key;
             vls[index] = "?";
-            values.put(params.get(key));
+            values.put(key.endsWith("_json") ? params.get(key).toString() : params.get(key));
             index++;
         }
         String sql = "INSERT INTO " + tablename + " ( " + StringUtils.join(fls, ',') + " ) VALUES ( " + StringUtils.join(vls, ',') + " ) ";
