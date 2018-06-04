@@ -8,4 +8,6 @@ public interface IDao {
     JSONObject create(String id, JSONObject params, JSONArray fields, JSONObject session);
     JSONObject update(String id, JSONObject params, JSONArray fields, JSONObject session);
     JSONObject delete(String id, JSONObject params, JSONArray fields, JSONObject session);
+    JSONObject querySql(String sql, JSONArray values, JSONObject params);
+    JSONObject querySql(String sql, JSONArray values);
 }

@@ -40,4 +40,14 @@ public class BaseDao implements IDao {
         JSONObject rs = MysqlDao.delete(this.table, id);
         return rs;
     }
+
+    public JSONObject querySql(String sql, JSONArray values, JSONObject params){
+        JSONObject rs = MysqlDao.querySql(sql, values, params);
+        return rs;
+    }
+
+    public JSONObject querySql(String sql, JSONArray values){
+        JSONObject rs = MysqlDao.querySql(sql, values, null);
+        return rs;
+    }
 }

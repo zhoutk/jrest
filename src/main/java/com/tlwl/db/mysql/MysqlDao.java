@@ -75,9 +75,15 @@ public class MysqlDao {
         return query(tablename, params, fields, null, null);
     }
 
+    public static JSONObject querySql(String sql, JSONArray values, JSONObject params){
+        return query("QuerySqlSelect", params, null, sql, values);
+    }
+
     private static JSONObject query(String tablename, JSONObject params, JSONArray fields, String sql, JSONArray values) {
         if (values == null)
             values = new JSONArray();
+        if(params == null)
+            params = new JSONObject();
         String where = "";
         Boolean is_search = false;
         if (params.has("search")) {
@@ -160,7 +166,7 @@ public class MysqlDao {
                 } while (ors.length() > 0);
                 where += " ) ";
             } else {
-                String value = params.getString(key);
+                String value = params.get(key).toString();
                 if (value.startsWith("<,") || value.startsWith("<=,") || value.startsWith(">,") ||
                         value.startsWith(">=,") || value.startsWith("<>,") || value.startsWith("=,")) {
                     String[] vls = value.split(",");
@@ -199,7 +205,7 @@ public class MysqlDao {
         }
 
         if (tablename == "QuerySqlSelect") {
-            sql += "";
+            sql = sql + (where.isEmpty() ? "" : ((sql.toLowerCase().contains("where") ? " and " : " where ") + where));
         } else {
             String fls = "";
             if (fields != null && fields.length() > 0)
