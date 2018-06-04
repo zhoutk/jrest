@@ -33,7 +33,7 @@ public class MysqlDao {
         return conn[index];
     }
 
-    public static JSONObject delete(String tablename, String id){
+    public static JSONObject delete(String tablename, String id) {
         JSONArray values = new JSONArray();
         String sql = "DELETE from " + tablename + " WHERE id = ? ";
         values.put(id);
@@ -75,14 +75,45 @@ public class MysqlDao {
         return query(tablename, params, fields, null, null);
     }
 
-    public static JSONObject querySql(String sql, JSONArray values, JSONObject params){
+    public static JSONObject querySql(String sql, JSONArray values, JSONObject params) {
         return query("QuerySqlSelect", params, null, sql, values);
+    }
+
+    public static JSONObject execSql(String sql, JSONArray values) {
+        return execQuery(sql, values);
+    }
+
+    public static JSONObject insertBatch(String tablename, JSONArray values) {
+        String sql = "INSERT INTO " + tablename, upStr = "";
+        JSONArray vs = new JSONArray();
+        for (int i = 0; i < values.length(); i++) {
+            JSONObject ps = values.getJSONObject(i);
+            Iterator<String> ks = ps.keys();
+            int index = 0;
+            String[] vls = new String[ps.length()];
+            String[] fls = new String[ps.length()];
+            while (ks.hasNext()) {
+                String key = ks.next();
+                if (i == 0) {
+                    fls[index] = key;
+                    upStr += key + " = values (" + key + "),";
+                }
+                vls[index] = "?";
+                vs.put(key.endsWith("_json") ? ps.get(key).toString() : ps.get(key));
+                index++;
+            }
+            if (i == 0)
+                sql += " ( " + StringUtils.join(fls, ',') + " ) values ";
+            sql += " ( " + StringUtils.join(vls, ',') + " ),";
+        }
+        sql = sql.substring(0, sql.length() - 1) + " ON DUPLICATE KEY UPDATE " + upStr.substring(0, upStr.length() - 1);
+        return execQuery(sql, vs);
     }
 
     private static JSONObject query(String tablename, JSONObject params, JSONArray fields, String sql, JSONArray values) {
         if (values == null)
             values = new JSONArray();
-        if(params == null)
+        if (params == null)
             params = new JSONObject();
         String where = "";
         Boolean is_search = false;
