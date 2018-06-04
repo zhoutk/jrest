@@ -95,7 +95,7 @@ public class Router implements ContainerResponseFilter {
                     Class cls = Class.forName("com.tlwl.auth." + Tools.underlineToCamel(urls[0]));
                     Constructor constructor = cls.getConstructor();
                     Object obj = constructor.newInstance();
-                    Method sf = cls.getMethod(urls[1], params.getClass() , payload.getClass());
+                    Method sf = cls.getMethod(urls[1], org.json.JSONObject.class , org.json.JSONObject.class);
                     rs = (JSONObject) sf.invoke(obj, params, payload);
                 }catch (Exception ex){
                     errMessage = ex.getMessage();
