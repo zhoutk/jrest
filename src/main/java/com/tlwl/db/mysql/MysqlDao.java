@@ -21,7 +21,8 @@ public class MysqlDao {
             try {
                 conn[index] = DriverManager.getConnection(
                         "jdbc:mysql://" + dbConfs.getString("db_host") + ":" + dbConfs.getInt("db_port") + "/" + dbConfs.getString("db_name") + "?" +
-                                "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_passwd") + "&characterEncoding=utf8&useSSL=false&autoReconnect=true");
+                                "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_passwd") +
+                                "&characterEncoding=utf8&useSSL=false&autoReconnect=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai");
             } catch (SQLException ex) {
                 // handle any errors
                 System.out.println("SQLException: " + ex.getMessage());
