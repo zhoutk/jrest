@@ -21,7 +21,7 @@ public class MysqlDao {
             try {
                 conn[index] = DriverManager.getConnection(
                         "jdbc:mysql://" + dbConfs.getString("db_host") + ":" + dbConfs.getInt("db_port") + "/" + dbConfs.getString("db_name") + "?" +
-                                "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_passwd") +
+                                "user=" + dbConfs.getString("db_user") + "&password=" + dbConfs.getString("db_pass") +
                                 "&characterEncoding=utf8&useSSL=false&autoReconnect=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai");
             } catch (SQLException ex) {
                 // handle any errors
@@ -35,13 +35,23 @@ public class MysqlDao {
 
     public static JSONObject delete(String tablename, String id) {
         JSONArray values = new JSONArray();
-        String sql = "DELETE from " + tablename + " WHERE id = ? ";
+        String sql = generateDeleteString(tablename);
         values.put(id);
         return execQuery(sql, values).put("id", id);
     }
 
+    private static String generateDeleteString(String tablename) {
+        return "DELETE from " + tablename + " WHERE id = ? ";
+    }
+
     public static JSONObject update(String tablename, JSONObject params, String id) {
         JSONArray values = new JSONArray();
+        String sql = generateUpdateString(tablename, params, values);
+        values.put(id);
+        return execQuery(sql, values).put("id", id);
+    }
+
+    private static String generateUpdateString(String tablename, JSONObject params, JSONArray values) {
         Iterator<String> ks = params.keys();
         String sql = "UPDATE " + tablename + " SET ";
         while (ks.hasNext()) {
@@ -49,12 +59,16 @@ public class MysqlDao {
             values.put(key.endsWith("_json") ? params.get(key).toString() : params.get(key));
             sql += key + " = ?" + (ks.hasNext() ? ", " : " WHERE id = ? ");
         }
-        values.put(id);
-        return execQuery(sql, values).put("id", id);
+        return sql;
     }
 
     public static JSONObject insert(String tablename, JSONObject params) {
         JSONArray values = new JSONArray();
+        String sql = generateInsertString(tablename, params, values);
+        return execQuery(sql, values);
+    }
+
+    private static String generateInsertString(String tablename, JSONObject params, JSONArray values) {
         Iterator<String> ks = params.keys();
         String[] fls = new String[params.length()];
         String[] vls = new String[params.length()];
@@ -66,9 +80,7 @@ public class MysqlDao {
             values.put(key.endsWith("_json") ? params.get(key).toString() : params.get(key));
             index++;
         }
-        String sql = "INSERT INTO " + tablename + " ( " + StringUtils.join(fls, ',') + " ) VALUES ( " + StringUtils.join(vls, ',') + " ) ";
-
-        return execQuery(sql, values);
+        return "INSERT INTO " + tablename + " ( " + StringUtils.join(fls, ',') + " ) VALUES ( " + StringUtils.join(vls, ',') + " ) ";
     }
 
     public static JSONObject select(String tablename, JSONObject params, JSONArray fields) {  //String tablename, Object params, String [] fields
@@ -81,6 +93,134 @@ public class MysqlDao {
 
     public static JSONObject execSql(String sql, JSONArray values) {
         return execQuery(sql, values);
+    }
+
+    public static JSONObject transGo(JSONArray objs) {
+        String errMessage = "", sqlStr = "";
+        int upCount = 0, opCount = 0;
+        boolean isBreak = false;
+        JSONArray values = null;
+        Connection conn = createConnection();
+        try {
+            conn.setAutoCommit(false);
+            System.out.println("Trans Go Start ... ");
+            for (Object obj : objs) {
+                JSONObject al = (JSONObject) obj;
+                String method = al.getString("method");
+                JSONObject params = null;
+                values = new JSONArray();
+                sqlStr = "";
+                String id = al.get("id") == null ? "" : al.get("id").toString();
+                if(al.has("sql")){
+                    sqlStr = al.getString("sql");
+                    if(al.has("params"))
+                        values = al.getJSONArray("params");
+                    if(!id.isEmpty())
+                        values.put(id);
+                }else{
+                    if(!al.has("params") && !method.equals("Delete")) {
+                        isBreak = true;
+                        errMessage = "Params must not be empty.";
+                        return GlobalConst.getErrorsJSON(301).put("message", "Params must not be empty.");
+                    }
+                    if(al.has("params")){
+                        params = al.getJSONObject("params");
+                    }
+                    if(method.equals("Update") || method.equals("Delete")){
+                        if (id.isEmpty() && params != null) {
+                            id = params.get("id") == null ? "" : params.get("id").toString();
+                        }
+                        if(id.isEmpty()) {
+                            isBreak = true;
+                            errMessage = "Id must not be empty.";
+                            return GlobalConst.getErrorsJSON(301).put("message", "Id must not be empty.");
+                        }
+                        if(params != null && params.has("id")) {
+                            params.remove("id");
+                        }
+                    }else if(method.equals("Insert") && !id.isEmpty()){
+                        params.put("id", id);
+                    }
+                    String tablename = al.getString("table");
+                    if(tablename.isEmpty()) {
+                        isBreak = true;
+                        errMessage = "Tablename must not be empty.";
+                        return GlobalConst.getErrorsJSON(301).put("message", "Tablename must not be empty.");
+                    }
+                    switch (method) {
+                        case "Insert":
+                            sqlStr = generateInsertString(tablename, al.getJSONObject("params"), values);
+                            break;
+                        case "Update":
+                            sqlStr = generateUpdateString(tablename, al.getJSONObject("params"), values);
+                            values.put(id);
+                            break;
+                        case "Delete":
+                            sqlStr = generateDeleteString(tablename);
+                            values.put(id);
+                            break;
+                        default:
+                            isBreak = true;
+                            errMessage = "Method is wrong.";
+                            return GlobalConst.getErrorsJSON(301).put("message", "Method is wrong.");
+                    }
+                }
+                upCount += processStatement(conn, values, sqlStr);
+                System.out.println("Tras." + ++opCount + ": " + sqlStr + "; VALUES: " + values.toString());
+            }
+            conn.commit();
+        } catch (Exception ex) {
+            isBreak = true;
+            errMessage += ex.getMessage();
+            System.out.println("Trans Rollbak: " + errMessage);
+            System.out.println("Fail Sql: " + sqlStr + "; VALUES: " + values.toString());
+            try {
+                conn.rollback();
+                errMessage += "; rollbak success.";
+            } catch (SQLException e) {
+                errMessage += "; rollbak failure.";
+                e.printStackTrace();
+            }
+        } finally {
+            if(isBreak){
+                try {
+                    conn.rollback();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Trans Rollbak: " + errMessage);
+                System.out.println("Trans Go Stop Failure.");
+            }else
+                System.out.println("Trans Go Stop Success.");
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                try {
+                    conn.close();
+                } catch (SQLException eclose) {
+                    eclose.printStackTrace();
+                }
+            }
+        }
+        if (errMessage.isEmpty())
+            return GlobalConst.getSuccessJSON().put("run operate count: ", opCount).put("update records count: ", upCount);
+        else
+            return GlobalConst.getErrorsJSON(500).put("message", errMessage);
+    }
+
+    private static int processStatement(Connection conn, JSONArray values, String sql) throws SQLException {
+        Iterator ks = values.iterator();
+        DBParams ps = new DBParams();
+        int m = 0;
+        while (ks.hasNext()) {
+            ps.addParam(values.get(m));
+            m++;
+            ks.next();
+        }
+        PreparedStatement pst = conn.prepareStatement(sql);
+        ps.prepareStatement(pst);
+        pst.execute();
+        return pst.getUpdateCount();
     }
 
     public static JSONObject insertBatch(String tablename, JSONArray values) {

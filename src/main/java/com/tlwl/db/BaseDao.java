@@ -79,4 +79,12 @@ public class BaseDao implements IDao {
         JSONObject rs = MysqlDao.insertBatch(tablename, values);
         return rs;
     }
+
+    public JSONObject transGo(JSONArray objs){
+        if(objs == null || objs.length() == 0)
+            return GlobalConst.getErrorsJSON(301);
+        JSONObject rs = MysqlDao.transGo(objs);
+        return rs;
+    }
+
 }
